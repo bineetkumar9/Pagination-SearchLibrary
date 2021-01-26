@@ -67,7 +67,7 @@ class searching
         }
         $input_new= preg_replace($pattern_date_btn, '', $input_new); 
 
-        $pattern_email= "/\b[-0-9a-zA-Z.+_]+@[-0-9a-zA-Z.+_]+.[a-zA-Z]{2,4}\b/";
+        $pattern_email= "/^([a-z0-9\+_\-]+)(\.[a-z0-9\+_\-]+)*@([a-z0-9\-]+\.)+[a-z]{2,6}$/ix";
         if(preg_match_all($pattern_email, $input_new, $output) )
         {
             $email=$output[0][0];    
@@ -91,10 +91,19 @@ class searching
         {
             echo "string";
         }
-
+        
         foreach ($query_data as $key => $value_q)
         {   
-            if(!empty($data['string']))
+            if(!empty($data['email']))
+            {
+                if ($value_q['type2']=='email') 
+                {   
+                    $query='SELECT '.$value_q['get_colms'].' FROM '.$value_q['table_name'].' WHERE '.$value_q['search_col_email'].'="'.$email.'"';
+                    array_push($query_array, $query);
+                    array_push($get_ids,$value_q['get_id']); 
+                }
+            }
+            elseif(!empty($data['string']))
             {
                 if ($value_q['type']=='string') 
                 {  
@@ -111,15 +120,6 @@ class searching
                     }
                     
                     array_push($get_ids,$value_q['get_id']);   
-                }
-            }
-            if(!empty($data['email']))
-            {
-                if ($value_q['type']=='email') 
-                {   
-                    $query='SELECT '.$value_q['get_colms'].' FROM '.$value_q['table_name'].' WHERE '.$value_q['search_col_name'].'="'.$email.'"';
-                    array_push($query_array, $query);
-                    array_push($get_ids,$value_q['get_id']); 
                 }
             }
 
